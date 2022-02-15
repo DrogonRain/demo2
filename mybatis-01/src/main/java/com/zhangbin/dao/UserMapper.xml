@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namesapce绑定一个对应的Dao/Mapper接口-->
+<mapper namespace="com.zhangbin.dao.UserMapper">
+    <resultMap id="UserMap" type="User">
+<!--        id为主键-->
+        <id column="id" property="id"/>
+        <id column="name" property="name"/>
+        <id column="pwd" property="password"/>
+    </resultMap>
+
+    <select id="getUser" parameterType="map" resultMap="UserMap">
+             select id,name,pwd from user limit #{startIndex},#{pageSize};
+    </select>
+
+    <select id="getUserById" parameterType="int" resultType="com.zhangbin.pojo.User">
+             select id,name,pwd from user where id = #{id};
+    </select>
+
+    <insert id="addUser" parameterType="com.zhangbin.pojo.User">
+             insert into user(id,name,pwd) values(#{id},#{name},#{pwd});
+    </insert>
+
+    <select id="getUserByIdAndName" parameterType="map" resultType="com.zhangbin.pojo.User">
+             select id,name,pwd from user where id = #{id} and name = #{name};
+    </select>
+
+    <select id="getUserByLike" parameterType="String" resultMap="UserMap">
+             select id,name,pwd from user where name like "%"#{name}"%";
+    </select>
+
+    <select id="queryUserById" resultType="user">
+        select id,name,pwd password from user where id = #{id}
+    </select>
+
+    <cache
+        eviction="FIFO"
+        flushInterval="60000"
+        size="512"
+        readOnly="true"/>
+    <!--这个更高级的配置创建了一个 FIFO 缓存，每隔 60 秒刷新，最多可以存储结果对象或列表的 512 个引用，
+        而且返回的对象被认为是只读的，因此对它们进行修改可能会在不同线程中的调用者产生冲突-->
+</mapper>
