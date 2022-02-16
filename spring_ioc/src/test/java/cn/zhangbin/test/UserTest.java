@@ -13,14 +13,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class UserTest {
-    @Test
-    public void test(){
-        UserServiceImpl userService = new UserServiceImpl();
-        userService.setUserDao(new UserDaoImpl());
-        userService.getUser();
-        userService.setUserDao(new UserDaoMySqlmpl());
-        userService.getUser();
-    }
+//    @Test
+//    public void test(){
+//        UserServiceImpl userService = new UserServiceImpl();
+//        userService.setUserDao(new UserDaoImpl());
+//        userService.getUser();
+//        userService.setUserDao(new UserDaoMySqlmpl());
+//        userService.getUser();
+//    }
 
     @Test
     public void test2(){
@@ -31,12 +31,12 @@ public class UserTest {
         System.out.println(hello);
     }
 
-    @Test
-    public void test3(){
-        ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
-        UserServiceImpl userService = (UserServiceImpl) context.getBean("serviceImpl");
-        userService.getUser();
-    }
+//    @Test
+//    public void test3(){
+//        ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+//        UserServiceImpl userService = (UserServiceImpl) context.getBean("serviceImpl");
+//        userService.getUser();
+//    }
 
     @Test
     public void test4(){

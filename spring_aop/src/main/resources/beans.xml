@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd ">
+
+<!--    Spring中使用Spring AOP支持声明式事务管理
+        Spring管理事务
+            xmlns:tx="http://www.springframework.org/schema/tx"
+
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+编程式事务管理
+    将事务管理代码嵌到业务方法中来控制事务的提交和回滚
+    缺点：必须在每个事务操作业务逻辑中包含额外的事务管理代码
+声明式事务管理
+    一般情况下比编程式事务好用。
+    将事务管理代码从业务方法中分离出来，以声明的方式来实现事务管理。
+    将事务管理作为横切关注点，通过aop方法模块化。Spring中通过Spring AOP框架支持声明式事务管理。
+事务管理器
+    无论使用Spring的哪种事务管理策略（编程式或者声明式）事务管理器都是必须的。
+    就是 Spring的核心事务管理抽象，管理封装了一组独立于技术的方法。-->
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--
+ spring事务传播特性：
+    事务传播行为就是多个事务方法相互调用时，事务如何在这些方法间传播。spring支持7种事务传播行为：
+        spring默认传播行为为required
+        1.propagation_required：如果当前没有事务，就新建一个事务，如果已存在一个事务中，加入到这个事务中，这是最常见的选择。
+        2.propagation_supports：支持当前事务，如果没有当前事务，就以非事务方法执行。
+        3.propagation_mandatory：使用当前事务，如果没有当前事务，就抛出异常。
+        4.propagation_required_new：新建事务，如果当前存在事务，把当前事务挂起。
+        5.propagation_not_supported：以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。
+        6.propagation_never：以非事务方式执行操作，如果当前事务存在则抛出异常。
+        7.propagation_nested：如果当前存在事务，则在嵌套事务内执行。如果当前没有事务，则执行与propagation_required类似的操作
+    -->
+    <!--配置事务通知-->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!--配置哪些方法是使用什么样的事务,配置事务的传播特性-->
+            <tx:method name="add" propagation="REQUIRED"/>
+            <tx:method name="delete" propagation="REQUIRED"/>
+            <tx:method name="update" propagation="REQUIRED"/>
+            <tx:method name="search" propagation="REQUIRED"/>
+            <tx:method name="get" read-only="true"/>
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--配置aop织入事务-->
+    <aop:config>
+        <aop:pointcut id="txPointcut" expression="execution(* cn.zhangbin.dao.*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+    </aop:config>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/mybatis?characterEncoding=utf8&amp;useSSL=false&amp;serverTimezone=Asia/Shanghai&amp;rewriteBatchedStatements=true"/>
+        <property name="username" value="root"/>
+        <property name="password" value="q1127965"/>
+    </bean>
+
+    <!--配置SqlSessionFactory-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!--关联MyBatis-->
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+        <property name="mapperLocations" value="classpath:cn/zhangbin/dao/*.xml"/>
+    </bean>
+
+<!--    注册sqlSessionTemplate,关联SqlSessionFactory-->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <!--利用构造器注入-->
+        <constructor-arg index="0" ref="sqlSessionFactory"/>
+    </bean>
+
+    <bean id="userDao" class="cn.zhangbin.dao.impl.UserDaoImpl">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+    </bean>
+
+    <bean id="teacherDao" class="cn.zhangbin.dao.impl.teacherDaoImpl">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+    </bean>
+
+</beans>
