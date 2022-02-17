@@ -2,7 +2,7 @@
   Created by IntelliJ IDEA.
   User: zhangbin
   Date: 2022/2/16
-  Time: 下午2:23
+  Time: 下午9:15
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -11,6 +11,9 @@
     <title>$Title$</title>
   </head>
   <body>
-  $END$
+  <form action="/e/t" method="post">
+    <input type="text" name="name">
+    <input type="submit">
+  </form>
   </body>
 </html>
